@@ -4,13 +4,15 @@
     "scripts": {
         "start": "static . -p 8888",
         "test": "npx playwright test",
-        "postinstall": "npx playwright install"
+        "postinstall": "npx playwright install",
+        "vendor": "node scripts/build-vendor.js"
     },
     "devDependencies": {
         "@playwright/test": "^1.52.0",
         "node-static": "^0.7.11"
     },
     "dependencies": {
-        "jquery": "^3.7.1"
+        "jquery": "^3.7.1",
+        "leaflet": "^1.9.4"
     }
 }

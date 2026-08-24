@@ -3,36 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>San Diego Top Spots</title>
+  <title>San Diego Top Spots — 30 places worth the drive</title>
+  <meta name="description" content="An interactive guide to 30 of San Diego's best spots, with a live map, filters, and a compass that picks your next stop." />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
   <header class="hero">
+    <div class="hero-grain"></div>
     <div class="hero-content">
-      <h1> San Diego Top Spots</h1>
-      <p class="hero-subtitle">Your guide to the best downtown San Diego has to offer</p>
+      <p class="eyebrow">A field guide, downtown &amp; beyond</p>
+      <h1>San Diego<br>Top Spots</h1>
+      <p class="hero-subtitle">30 places worth the drive — beaches, breweries, museums, and a few weird ones. Can't decide? Spin the compass.</p>
+
+      <div class="compass-block">
+        <button id="surprise-btn" class="compass-btn" type="button" aria-label="Spin the compass to jump to a random spot">
+          <svg class="compass-svg" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="compass-ring" cx="50" cy="50" r="44" />
+            <circle class="compass-ring-inner" cx="50" cy="50" r="35" />
+            <g class="compass-needle" transform-origin="50 50">
+              <path d="M50 14 L58 50 L50 86 L42 50 Z" class="needle-shape" />
+            </g>
+            <text x="50" y="12" class="compass-n">N</text>
+          </svg>
+        </button>
+        <div class="compass-label">
+          <span class="compass-label-title">Surprise me</span>
+          <span class="compass-label-sub">Jump to a random spot</span>
+        </div>
+      </div>
     </div>
   </header>
 
+  <div class="controls-bar" id="controls-bar">
+    <div class="controls-inner">
+      <label class="search-wrap" for="search-input">
+        <svg viewBox="0 0 24 24" class="search-icon" aria-hidden="true"><path d="M10 18a8 8 0 1 1 5.66-13.66A8 8 0 0 1 10 18Zm11 3-5.5-5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="search-input" type="text" placeholder="Search spots — “tacos”, “trail”, “ghost”…" autocomplete="off" />
+      </label>
+
+      <button id="favorites-toggle" class="chip favorites-chip" type="button" aria-pressed="false">
+        <span class="chip-heart">♡</span> Favorites <span id="favorites-count" class="chip-count">0</span>
+      </button>
+    </div>
+
+    <div class="category-row" id="category-row">
+      <!-- category chips injected by main.js -->
+    </div>
+  </div>
+
   <main class="container">
-    <table id="spots-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Link</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- rows get added here by main.js -->
-      </tbody>
-    </table>
+    <p id="results-count" class="results-count" aria-live="polite"></p>
+
+    <div class="content-grid">
+      <section class="cards-col" id="cards-col" aria-label="Spot list">
+        <!-- cards injected by main.js -->
+      </section>
+
+      <aside class="map-col">
+        <div class="map-sticky">
+          <div id="map"></div>
+          <p class="map-hint">Click a pin to preview a spot · click a card to find it on the map</p>
+        </div>
+      </aside>
+    </div>
+
+    <p id="empty-state" class="empty-state" hidden>
+      Nothing matches that search. Try a different word, or <button id="clear-filters-btn" type="button" class="link-btn">clear filters</button>.
+    </p>
   </main>
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <footer class="site-footer">
+    <p>Built for WEB102 · San Diego Top Spots · data-driven, not sponsored</p>
+  </footer>
+
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/leaflet/leaflet.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

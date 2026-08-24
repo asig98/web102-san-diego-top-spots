@@ -7,7 +7,7 @@ const url = `http://localhost:${PORT}/index.html`;
 
 let server;
 
-test.setTimeout(5000);
+test.setTimeout(10000);
 
 test.beforeAll(async () => {
   const fileServer = new nodeStatic.Server('./', { cache: 0 });
@@ -36,28 +36,62 @@ test.describe('HTML', () => {
     await page.goto(url);
   });
 
-  test('should have an H1 with the text "San Diego Top Spots"', async ({ page }) => {
-    const heading = page.locator('h1');
-    await expect(heading).toHaveText('San Diego Top Spots');
+  test('should have a hero H1 mentioning San Diego Top Spots', async ({ page }) => {
+    const heading = page.locator('.hero h1');
+    await expect(heading).toContainText('San Diego');
+    await expect(heading).toContainText('Top Spots');
   });
 
-  test('should load the correct page title', async ({ page }) => {
-    await expect(page).toHaveTitle('San Diego Top Spots');
+  test('should load a page title mentioning San Diego Top Spots', async ({ page }) => {
+    await expect(page).toHaveTitle(/San Diego Top Spots/);
+  });
+
+  test('should render the surprise-me compass button', async ({ page }) => {
+    await expect(page.locator('#surprise-btn')).toBeVisible();
   });
 });
 
 test.describe('Integration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(url);
+    await page.waitForSelector('.spot-card');
   });
 
-  test('should find a row with data', async ({ page }) => {
-    const firstCellText = await page.locator('table tbody tr td').first().textContent();
-    expect(firstCellText).toBe("Go For A Run In The San Diego Zoo Safari Park");
+  test('should render a card with the first spot\'s name', async ({ page }) => {
+    const firstTitle = await page.locator('.spot-card .card-title').first().textContent();
+    expect(firstTitle).toBe('Go For A Run In The San Diego Zoo Safari Park');
   });
 
-  test('should find a link with the correct map url', async ({ page }) => {
-    const mapLink = await page.locator('table tbody tr a').first().getAttribute('href');
+  test('should render 30 spot cards on load', async ({ page }) => {
+    await expect(page.locator('.spot-card')).toHaveCount(30);
+  });
+
+  test('should find a directions link with the correct map url', async ({ page }) => {
+    const mapLink = await page.locator('.spot-card a.pill-btn-outline').first().getAttribute('href');
     expect(mapLink).toBe('https://www.google.com/maps?q=33.09745,-116.99572');
+  });
+
+  test('should filter cards when searching', async ({ page }) => {
+    await page.fill('#search-input', 'ghost');
+    await page.waitForTimeout(200);
+    const count = await page.locator('.spot-card').count();
+    expect(count).toBeGreaterThan(0);
+    const titles = await page.locator('.spot-card .card-title').allTextContents();
+    for (const title of titles) {
+      const card = page.locator('.spot-card', { hasText: title });
+      const text = (await card.textContent()).toLowerCase();
+      expect(text).toContain('ghost');
+    }
+  });
+
+  test('should toggle a spot into favorites', async ({ page }) => {
+    await page.locator('.spot-card .fav-btn').first().click();
+    await expect(page.locator('#favorites-count')).toHaveText('1');
+  });
+
+  test('should filter to favorites only when toggled', async ({ page }) => {
+    await page.locator('.spot-card .fav-btn').first().click();
+    await page.locator('#favorites-toggle').click();
+    await expect(page.locator('.spot-card')).toHaveCount(1);
   });
 });
